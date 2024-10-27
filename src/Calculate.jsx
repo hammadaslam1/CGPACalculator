@@ -1,203 +1,238 @@
-import React, {useState} from 'react';
+/* eslint-disable react-hooks/exhaustive-deps */
+import React, {useEffect, useState} from 'react';
 import {
-  View,
+  ScrollView,
   Text,
   TextInput,
+  View,
   Button,
-  ScrollView,
   StyleSheet,
-  Alert,
 } from 'react-native';
 import SaveResults from './SaveFile';
-const Calculate = () => {
-  const [students, setStudents] = useState([]);
+// import styles from './styles'; // Adjust the import path for your styles
+
+const StudentResultSystem = () => {
+  const [topStudents, setTopStudents] = useState([]);
   const [currentStudent, setCurrentStudent] = useState({
     name: '',
-    eng: 0,
+    english: 0,
     urdu: 0,
     maths: 0,
-    subject: '',
-    pst: 0,
-    isl: 0,
-    alq: 0,
-    phy: 0,
-    chem: 0,
+    pakstudies: 0,
+    islamiat: 0,
+    alquran: 0,
+    physics: 0,
+    chemistry: 0,
+    biology: 0,
     totalMarks: 0,
-    percentage: 0,
-    grade: '',
+    average: 0,
+    cgpa: 0,
+    rank: 0,
+    // Add more subjects as needed
   });
+  const allInputs = [
+    {
+      label: 'Full Name',
+      placeholder: 'Enter Full Name',
+      marks: false,
+      onClick: handleNameChange,
+      field: 'name',
+      value: currentStudent.name,
+    },
+    {
+      label: 'English',
+      placeholder: 'Enter English Marks',
+      marks: 75,
+      onClick: handleInputChange,
+      field: 'english',
+      value: currentStudent.english,
+    },
+    {
+      label: 'Urdu',
+      placeholder: 'Enter Urdu Marks',
+      marks: 75,
+      onClick: handleInputChange,
+      field: 'urdu',
+      value: currentStudent.urdu,
+    },
+    {
+      label: 'Mathematics',
+      placeholder: 'Enter Mathematics Marks',
+      marks: 75,
+      onClick: handleInputChange,
+      field: 'maths',
+      value: currentStudent.maths,
+    },
+    {
+      label: 'Pak Studies',
+      placeholder: 'Enter Pak Studies Marks',
+      marks: 50,
+      onClick: handleInputChange,
+      field: 'pakstudies',
+      value: currentStudent.pakstudies,
+    },
+    {
+      label: 'Islamiat',
+      placeholder: 'Enter Islamiat Marks',
+      marks: 50,
+      onClick: handleInputChange,
+      field: 'islamiat',
+      value: currentStudent.islamiat,
+    },
+    {
+      label: 'Al-Quran',
+      placeholder: 'Enter Al-Quran Marks',
+      marks: 50,
+      onClick: handleInputChange,
+      field: 'alquran',
+      value: currentStudent.alquran,
+    },
+    {
+      label: 'Physics',
+      placeholder: 'Enter Physics Marks',
+      marks: 60,
+      onClick: handleInputChange,
+      field: 'physics',
+      value: currentStudent.physics,
+    },
+    {
+      label: 'Chemistry',
+      placeholder: 'Enter Chemistry Marks',
+      marks: 60,
+      onClick: handleInputChange,
+      field: 'chemistry',
+      value: currentStudent.chemistry,
+    },
+    {
+      label: 'Biology',
+      placeholder: 'Enter Biology Marks',
+      marks: 60,
+      onClick: handleInputChange,
+      field: 'biology',
+      value: currentStudent.biology,
+    },
+  ];
 
-  const calculateGrade = percentage => {
-    if (percentage >= 90) {
-      return 'A+';
-    }
-    if (percentage >= 80) {
-      return 'A';
-    }
-    if (percentage >= 70) {
-      return 'B+';
-    }
-    if (percentage >= 60) {
-      return 'B';
-    }
-    if (percentage >= 50) {
-      return 'C';
-    }
-    if (percentage >= 40) {
-      return 'D';
-    }
-    return 'F';
-  };
+  const [students, setStudents] = useState([]);
 
   const handleInputChange = (field, value) => {
+    setCurrentStudent({
+      ...currentStudent,
+      [field]: Number(value),
+    });
+  };
+  const handleNameChange = (field, value) => {
     setCurrentStudent({
       ...currentStudent,
       [field]: value,
     });
   };
 
-  const handleSubmit = () => {
-    const totalMarks =
-      parseInt(currentStudent.eng, 10) +
-      parseInt(currentStudent.urdu, 10) +
-      parseInt(currentStudent.maths, 10) +
-      parseInt(currentStudent.pst, 10) +
-      parseInt(currentStudent.isl, 10) +
-      parseInt(currentStudent.alq, 10) +
-      parseInt(currentStudent.phy, 10) +
-      parseInt(currentStudent.chem, 10);
+  const calculateCGPA = percentage => {
+    if (percentage < 50) return 0;
+    let cgpa = 2.0 + Math.floor((percentage - 50) / 2) * 0.1;
+    if (cgpa > 4.0) cgpa = 4.0;
+    return cgpa; // 0 for fail
+  };
 
-    const percentage = (totalMarks / 545) * 100;
-    const grade = calculateGrade(percentage);
+  const handleSubmit = () => {
+    const {
+      english, //75
+      urdu, //75
+      maths, //75
+      pakstudies, //50
+      islamiat, //50
+      alquran, //50
+      physics, //60
+      chemistry, //60
+      biology, //60
+      name, //name
+    } = currentStudent;
+    let totalMarks =
+      Number(english) +
+      Number(urdu) +
+      Number(maths) +
+      Number(pakstudies) +
+      Number(islamiat) +
+      Number(alquran) +
+      Number(physics) +
+      Number(biology) +
+      Number(chemistry);
+    let percentage = (totalMarks / 555.0) * 100.0;
+    let grade = '';
+
+    if (percentage >= 90) {
+      grade = 'A+';
+    } else if (percentage >= 80) {
+      grade = 'A';
+    } else if (percentage >= 70) {
+      grade = 'B+';
+    } else if (percentage >= 60) {
+      grade = 'B';
+    } else if (percentage >= 50) {
+      grade = 'C';
+    } else if (percentage >= 40) {
+      grade = 'D';
+    } else {
+      grade = 'F';
+    }
+
+    const cgpa = calculateCGPA(percentage);
 
     const newStudent = {
-      ...currentStudent,
+      name,
       totalMarks,
       percentage,
       grade,
+      cgpa,
     };
 
     setStudents([...students, newStudent]);
     setCurrentStudent({
       name: '',
-      eng: 0,
+      english: 0,
       urdu: 0,
       maths: 0,
-      subject: '',
-      pst: 0,
-      isl: 0,
-      alq: 0,
-      phy: 0,
-      chem: 0,
-      totalMarks: 0,
-      percentage: 0,
-      grade: '',
+      pakstudies: 0,
+      islamiat: 0,
+      alquran: 0,
+      physics: 0,
+      chemistry: 0,
+      biology: 0,
     });
   };
-
+  const getTopStudents = () => {
+    // Sort students by percentage in descending order and slice the top 3
+    return students
+      .slice()
+      .sort((a, b) => b.percentage - a.percentage)
+      .slice(0, 3);
+  };
+  useEffect(() => {
+    setTopStudents(getTopStudents());
+  }, [students]);
   return (
     <ScrollView contentContainerStyle={styles.container}>
       <Text style={styles.title}>Student Result System</Text>
-      <View style={styles.inputContainer}>
-        <Text>Name:</Text>
-        <TextInput
-          style={styles.input}
-          value={currentStudent.name}
-          onChangeText={text => handleInputChange('name', text)}
-          placeholder="Enter student name"
-        />
-      </View>
-      <View style={styles.inputContainer}>
-        <Text>English Marks (out of 75):</Text>
-        <TextInput
-          style={styles.input}
-          keyboardType="numeric"
-          value={currentStudent.eng.toString()}
-          onChangeText={text => handleInputChange('eng', text)}
-          placeholder="Enter marks"
-        />
-      </View>
-      <View style={styles.inputContainer}>
-        <Text>Urdu Marks (out of 75):</Text>
-        <TextInput
-          style={styles.input}
-          keyboardType="numeric"
-          value={currentStudent.urdu.toString()}
-          onChangeText={text => handleInputChange('urdu', text)}
-          placeholder="Enter marks"
-        />
-      </View>
-      <View style={styles.inputContainer}>
-        <Text>Maths Marks (out of 75):</Text>
-        <TextInput
-          style={styles.input}
-          keyboardType="numeric"
-          value={currentStudent.maths.toString()}
-          onChangeText={text => handleInputChange('maths', text)}
-          placeholder="Enter marks"
-        />
-      </View>
-      <View style={styles.inputContainer}>
-        <Text>Computer/Biology Marks (out of 50/60):</Text>
-        <TextInput
-          style={styles.input}
-          keyboardType="numeric"
-          value={currentStudent.subject.toString()}
-          onChangeText={text => handleInputChange('subject', text)}
-          placeholder="Enter marks"
-        />
-      </View>
-      <View style={styles.inputContainer}>
-        <Text>PST Marks (out of 50):</Text>
-        <TextInput
-          style={styles.input}
-          keyboardType="numeric"
-          value={currentStudent.pst.toString()}
-          onChangeText={text => handleInputChange('pst', text)}
-          placeholder="Enter marks"
-        />
-      </View>
-      <View style={styles.inputContainer}>
-        <Text>Islamiat Marks (out of 50):</Text>
-        <TextInput
-          style={styles.input}
-          keyboardType="numeric"
-          value={currentStudent.isl.toString()}
-          onChangeText={text => handleInputChange('isl', text)}
-          placeholder="Enter marks"
-        />
-      </View>
-      <View style={styles.inputContainer}>
-        <Text>Al-Quran Marks (out of 50):</Text>
-        <TextInput
-          style={styles.input}
-          keyboardType="numeric"
-          value={currentStudent.alq.toString()}
-          onChangeText={text => handleInputChange('alq', text)}
-          placeholder="Enter marks"
-        />
-      </View>
-      <View style={styles.inputContainer}>
-        <Text>Physics Marks (out of 60):</Text>
-        <TextInput
-          style={styles.input}
-          keyboardType="numeric"
-          value={currentStudent.phy.toString()}
-          onChangeText={text => handleInputChange('phy', text)}
-          placeholder="Enter marks"
-        />
-      </View>
-      <View style={styles.inputContainer}>
-        <Text>Chemistry Marks (out of 60):</Text>
-        <TextInput
-          style={styles.input}
-          keyboardType="numeric"
-          value={currentStudent.chem.toString()}
-          onChangeText={text => handleInputChange('chem', text)}
-          placeholder="Enter marks"
-        />
-      </View>
+      {allInputs.map((data, i) => (
+        <View key={i} style={styles.inputContainer}>
+          <Text>{data.label}:</Text>
+          <TextInput
+            style={styles.input}
+            keyboardType={data.field == 'name' ? '' : 'numeric'}
+            value={data.value}
+            onChangeText={text => {
+              setCurrentStudent({
+                ...currentStudent,
+                [data.field]: text,
+              });
+            }}
+            placeholder={data.placeholder}
+          />
+        </View>
+      ))}
       <Button style={styles.button} title="Calculate" onPress={handleSubmit} />
+      {/* <SaveResults studentData={students} /> */}
 
       <Text style={styles.subtitle}>Student Results:</Text>
       {students.map((student, index) => (
@@ -207,15 +242,26 @@ const Calculate = () => {
           </Text>
           <Text>
             Percentage: {student.percentage.toFixed(2)}%, Grade: {student.grade}
+            , CGPA: {student.cgpa.toFixed(2)}
           </Text>
         </View>
       ))}
-
-      <SaveResults studentData={students} />
+      <Text style={styles.subtitle}>Top 3 Students:</Text>
+      {topStudents.length > 0 ? (
+        topStudents.map((student, index) => (
+          <View key={index} style={styles.result}>
+            <Text>
+              {student.name} - Total Marks: {student.totalMarks}, Percentage:{' '}
+              {student.percentage.toFixed(2)}%
+            </Text>
+          </View>
+        ))
+      ) : (
+        <Text>No students available.</Text>
+      )}
     </ScrollView>
   );
 };
-
 const styles = StyleSheet.create({
   container: {
     padding: 20,
@@ -237,6 +283,7 @@ const styles = StyleSheet.create({
     padding: 10,
     borderRadius: 5,
     marginTop: 5,
+    color: '#000',
   },
   subtitle: {
     fontSize: 20,
@@ -254,5 +301,4 @@ const styles = StyleSheet.create({
     color: '#fff',
   },
 });
-
-export default Calculate;
+export default StudentResultSystem;
